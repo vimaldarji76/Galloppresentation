@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Poll · Gallup Q4</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.10);
+    --text: #1a1a18;
+    --muted: #888780;
+    --accent: #2a78d6;
+    --accent-light: #e8f1fb;
+    --accent-on: #ffffff;
+    --danger: #c0392b;
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 4rem;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+    max-width: 560px;
+    width: 100%;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  header h1 {
+    font-family: 'Lora', serif;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem 2rem;
+    max-width: 560px;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .dots {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 1.25rem;
+  }
+
+  .dot {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.12s;
+    user-select: none;
+  }
+
+  .dot:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+  .dot.selected { background: var(--accent); color: var(--accent-on); border-color: var(--accent); }
+
+  .name-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.12s;
+  }
+  input[type="text"]:focus { border-color: var(--accent); }
+  input[type="text"]::placeholder { color: var(--muted); }
+
+  button {
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  button:hover { background: var(--bg); border-color: #bbb; }
+  button:active { transform: scale(0.98); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-on);
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: #1e66c0; border-color: #1e66c0; }
+
+  .msg {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 8px;
+    min-height: 18px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 1.25rem;
+  }
+  .tab {
+    font-size: 13px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .tab.active { background: var(--accent); color: var(--accent-on); border-color: var(--accent); }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+  .stat {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .stat-val { font-size: 22px; font-weight: 600; color: var(--text); }
+
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .bar-num { font-size: 13px; color: var(--muted); width: 14px; text-align: right; flex-shrink: 0; }
+  .bar-track { flex: 1; background: var(--bg); border-radius: 4px; height: 26px; overflow: hidden; }
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--accent);
+    transition: width 0.4s ease;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+  .bar-inner { font-size: 12px; color: #fff; padding-left: 8px; font-weight: 500; }
+  .bar-zero { font-size: 12px; color: var(--muted); padding-left: 8px; }
+
+  .responses-list {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 2;
+  }
+  .response-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 0.5px solid var(--border);
+    padding: 6px 0;
+  }
+  .response-item:last-child { border-bottom: none; }
+  .response-score {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .response-name { font-size: 13px; color: var(--text); }
+
+  .btn-danger { color: var(--danger); border-color: rgba(192,57,43,0.3); font-size: 12px; margin-top: 0.75rem; }
+  .btn-danger:hover { background: rgba(192,57,43,0.05); }
+
+  .empty { font-size: 14px; color: var(--muted); padding: 1rem 0; }
+  .hidden { display: none; }
+
+  footer {
+    margin-top: 2rem;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  @media (max-width: 480px) {
+    .dots { gap: 8px; }
+    .dot { width: 42px; height: 42px; font-size: 14px; }
+    header h1 { font-size: 22px; }
+    .card { padding: 1.25rem 1.25rem; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Gallup Q12 · Question 04</p>
+  <h1>"At work, I have the opportunity to do what I do best every day."</h1>
+</header>
+
+<div class="card">
+  <div class="scale-labels"><span>Strongly disagree</span><span>Strongly agree</span></div>
+  <div class="dots" id="dots">
+    <div class="dot" data-v="1" onclick="pick(this)">1</div>
+    <div class="dot" data-v="2" onclick="pick(this)">2</div>
+    <div class="dot" data-v="3" onclick="pick(this)">3</div>
+    <div class="dot" data-v="4" onclick="pick(this)">4</div>
+    <div class="dot" data-v="5" onclick="pick(this)">5</div>
+  </div>
+  <div class="name-row">
+    <input type="text" id="nameInput" placeholder="Your name (optional)" maxlength="40" />
+    <button class="btn-primary" onclick="submitScore()">Submit</button>
+  </div>
+  <p class="msg" id="msg"></p>
+</div>
+
+<div class="card">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('results')" id="tab-results">Live results</div>
+    <div class="tab" onclick="showTab('responses')" id="tab-responses">Responses</div>
+  </div>
+
+  <div id="view-results">
+    <div class="stats-row">
+      <div class="stat"><div class="stat-label">Responses</div><div class="stat-val" id="stat-count">—</div></div>
+      <div class="stat"><div class="stat-label">Average</div><div class="stat-val" id="stat-avg">—</div></div>
+      <div class="stat"><div class="stat-label">Most common</div><div class="stat-val" id="stat-mode">—</div></div>
+    </div>
+    <div id="bars"></div>
+    <button class="btn-danger" onclick="clearAll()">Reset all responses</button>
+  </div>
+
+  <div id="view-responses" class="hidden">
+    <div id="names-list"><p class="empty">No responses yet.</p></div>
+  </div>
+</div>
+
+<footer>Results are stored in your browser. Share this file so everyone opens it on the same device, or host it online for remote teams.</footer>
+
+<script>
+const STORAGE_KEY = 'gallup-q4-v1';
+let chosen = null;
+
+function pick(el) {
+  document.querySelectorAll('.dot').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+  chosen = parseInt(el.dataset.v);
+}
+
+function loadResponses() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
+}
+
+function saveResponses(r) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(r));
+}
+
+function submitScore() {
+  if (!chosen) { document.getElementById('msg').textContent = 'Pick a score first.'; return; }
+  const name = document.getElementById('nameInput').value.trim() || 'Anonymous';
+  const responses = loadResponses();
+  responses.push({ name, score: chosen, ts: Date.now() });
+  saveResponses(responses);
+  document.getElementById('msg').textContent = `Got it, ${name}! Score of ${chosen} recorded.`;
+  document.querySelectorAll('.dot').forEach(d => d.classList.remove('selected'));
+  document.getElementById('nameInput').value = '';
+  chosen = null;
+  renderResults(responses);
+}
+
+function renderResults(responses) {
+  const n = responses.length;
+  document.getElementById('stat-count').textContent = n;
+  if (n === 0) {
+    document.getElementById('stat-avg').textContent = '—';
+    document.getElementById('stat-mode').textContent = '—';
+    document.getElementById('bars').innerHTML = '';
+    document.getElementById('names-list').innerHTML = '<p class="empty">No responses yet.</p>';
+    return;
+  }
+
+  const avg = responses.reduce((s, r) => s + r.score, 0) / n;
+  document.getElementById('stat-avg').textContent = avg.toFixed(1);
+
+  const freq = [0,0,0,0,0];
+  responses.forEach(r => freq[r.score - 1]++);
+  const mode = freq.indexOf(Math.max(...freq)) + 1;
+  document.getElementById('stat-mode').textContent = mode;
+
+  const maxFreq = Math.max(...freq, 1);
+  const barsEl = document.getElementById('bars');
+  barsEl.innerHTML = '';
+  freq.forEach((count, i) => {
+    const pct = Math.round((count / maxFreq) * 100);
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <span class="bar-num">${i+1}</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%">
+          ${count > 0 ? `<span class="bar-inner">${count}</span>` : ''}
+        </div>
+        ${count === 0 ? `<span class="bar-zero">0</span>` : ''}
+      </div>`;
+    barsEl.appendChild(row);
+  });
+
+  const listEl = document.getElementById('names-list');
+  listEl.innerHTML = [...responses].reverse().map(r => `
+    <div class="response-item">
+      <div class="response-score">${r.score}</div>
+      <span class="response-name">${r.name}</span>
+    </div>`).join('');
+}
+
+function showTab(tab) {
+  document.getElementById('view-results').classList.toggle('hidden', tab !== 'results');
+  document.getElementById('view-responses').classList.toggle('hidden', tab !== 'responses');
+  document.getElementById('tab-results').classList.toggle('active', tab === 'results');
+  document.getElementById('tab-responses').classList.toggle('active', tab !== 'results');
+}
+
+function clearAll() {
+  if (!confirm('Reset all responses? This cannot be undone.')) return;
+  saveResponses([]);
+  renderResults([]);
+  document.getElementById('msg').textContent = '';
+}
+
+renderResults(loadResponses());
+</script>
+</body>
+</html>
